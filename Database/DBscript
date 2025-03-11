@@ -1,0 +1,71 @@
+CREATE TABLE Project
+(
+  project_id SERIAL PRIMARY KEY,
+  project_name VARCHAR(255) NOT NULL,
+  project_description TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  project_status VARCHAR(50) NOT NULL,
+  customername VARCHAR(255) NOT NULL,
+  nation VARCHAR(100) NOT NULL,
+  cost DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE Task
+(
+  task_id SERIAL PRIMARY KEY,
+  project_id INT NOT NULL,
+  task_name VARCHAR(255) NOT NULL,
+  task_description TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  task_status VARCHAR(50) NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES Project(project_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Role
+(
+  role_id SERIAL PRIMARY KEY,
+  role_name VARCHAR(255) NOT NULL,
+  pay_rate_sg DECIMAL(10,2) NOT NULL,
+  pay_rate_vn DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE Employee
+(
+  employee_id SERIAL PRIMARY KEY,
+  firstname VARCHAR(255) NOT NULL,
+  lastname VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  isAdmin BOOLEAN NOT NULL,
+  role_id INT NOT NULL,
+  FOREIGN KEY (role_id) REFERENCES Role(role_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Project_Member
+(
+  ismanager BOOLEAN NOT NULL,
+  project_id INT NOT NULL,
+  employee_id INT NOT NULL,
+  PRIMARY KEY (project_id, employee_id),
+  FOREIGN KEY (project_id) REFERENCES Project(project_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Task_Assignment
+(
+  emp_startdate DATE,
+  emp_enddate DATE,
+  employee_id INT NOT NULL,
+  task_id INT NOT NULL,
+  PRIMARY KEY (employee_id, task_id),
+  FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (task_id) REFERENCES Task(task_id) 
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
