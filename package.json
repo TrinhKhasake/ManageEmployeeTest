@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "chmod +x node_modules/.bin/concurrently",
+     "postinstall": "chmod +x node_modules/.bin/concurrently",
     "start": "npx concurrently \"npm --prefix Backend start\" \"npm --prefix Frontend run dev\""
   },
-  "devDependencies": {
+  "dependencies": {
     "bcrypt": "^5.1.1",
     "concurrently": "^7.6.0",
     "rebuild": "^0.1.2"
