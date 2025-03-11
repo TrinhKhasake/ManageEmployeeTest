@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "concurrently \"npm --prefix Backend start\" \"npm --prefix Frontend run dev\""
+    "start": "npx concurrently \"npm --prefix Backend start\" \"npm --prefix Frontend run dev\""
   },
   "devDependencies": {
     "bcrypt": "^5.1.1",
