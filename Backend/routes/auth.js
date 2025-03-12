@@ -3,12 +3,10 @@ import pool from "../DB.js";
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
 
 dotenv.config();
 
 const router = express.Router();
-const saltRounds = 10;
 
 // Login endpoint using email and password
 router.post("/login", async (req, res) => {
@@ -31,9 +29,8 @@ router.post("/login", async (req, res) => {
 
     const employee = result.rows[0];
 
-    // Compare the provided password with the hashed password in the database
-    const passwordMatch = await bcrypt.compare(password, employee.password);
-    if (!passwordMatch) {
+    // Compare the provided password with the stored password
+    if (password !== employee.password) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
@@ -91,13 +88,13 @@ router.post("/createAccount", async (req, res) => {
       return res.status(400).json({ error: "Invalid role_id" });
     }
 
-    // Hash the password before storing it
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Use the password directly (without hashing)
+    const storedPassword = password;
 
     // Insert the new account into the employee table.
     const result = await pool.query(
       'INSERT INTO employee (firstname, lastname, email, password, isadmin, role_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING employee_id, firstname, lastname, email, isadmin, role_id',
-      [firstname, lastname, email, hashedPassword, isadmin, role_id]
+      [firstname, lastname, email, storedPassword, isadmin, role_id]
     );
 
     return res.status(201).json({
@@ -147,7 +144,6 @@ router.post("/getEmployeeById", async (req, res) => {
   }
 });
 
-
 // Update Employee endpoint: updates firstname, lastname, email, password, and role_id
 router.post("/updateEmployee", async (req, res) => {
   const { employee_id, firstname, lastname, email, password, confirmPassword, role_id } = req.body;
@@ -163,15 +159,15 @@ router.post("/updateEmployee", async (req, res) => {
   }
 
   try {
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    // Use the new password directly (without hashing)
+    const storedPassword = password;
 
     const result = await pool.query(
       `UPDATE employee 
        SET firstname = $1, lastname = $2, email = $3, password = $4, role_id = $5
        WHERE employee_id = $6 
        RETURNING employee_id, firstname, lastname, email, role_id, isadmin`,
-      [firstname, lastname, email, hashedPassword, role_id, employee_id]
+      [firstname, lastname, email, storedPassword, role_id, employee_id]
     );
 
     if (result.rowCount === 0) {
@@ -221,7 +217,7 @@ router.post("/deleteEmployee", async (req, res) => {
   }
 });
 
-//Get All Employees
+// Get All Employees
 router.get("/getEmployee", async (req, res) => {
   try {
     const result = await pool.query(
