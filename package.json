@@ -8,7 +8,7 @@
     "server": "cd Backend && nodemon server.js",
     "frontend": "npm run dev --prefix Frontend",
     "start": "concurrently \"npm run server\" \"npm run frontend\"",
-    "build": "npm install && npm install --prefix Frontend && npm run build --prefix Frontend",
+    "build": "npm install --prefix Backend && npm install --prefix Frontend && npm run build --prefix Frontend",
     "lint": "eslint .",
     "dev": "vite",
     "preview": "vite preview"
@@ -43,11 +43,11 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "concurrently": "^7.6.0",
     "@eslint/js": "^9.21.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
-    "concurrently": "^7.6.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.0.0",
