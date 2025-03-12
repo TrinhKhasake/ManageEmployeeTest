@@ -10,17 +10,19 @@ import timesheetRoutes from "./routes/timesheet.js";
 
 const app = express();
 
+// Enable CORS – adjust the origin for production if needed
 app.use(
   cors({
-    origin: "http://localhost:5173", // Adjust this as needed in production
+    origin: "http://localhost:5173", // update this to your production frontend URL if needed
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );
 
+// Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Mount your routes
+// Mount routes
 app.use("/projects", projectRoutes);
 app.use("/task", taskRoutes);
 app.use("/", authRoutes);
@@ -31,24 +33,26 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 
-// Use the Render provided port and bind to 0.0.0.0
+// Use Render's provided port, defaulting to 3000 locally.
 const PORT = process.env.PORT || 3000;
+
+// Create an HTTP server from the Express app.
 const server = http.createServer(app);
 
-// OPTIONAL: Integrate socket.io if needed
+// OPTIONAL: Initialize socket.io if you need real‑time features.
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // adjust as needed for production
+    origin: "http://localhost:5173", // update as needed for production
     methods: ["GET", "POST"],
   },
 });
 
-// Example socket.io connection handling
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
-  // Handle socket events here
+  // Add your socket event handlers here
 });
 
+console.log("Binding to port:", process.env.PORT || 3000);
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server Running on port ${PORT}`);
 });
