@@ -16,10 +16,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Enable CORS – adjust the origin for production if needed
+// Enable CORS for both development and production origins
 app.use(
   cors({
-    origin: "http://localhost:5173", // update this for your production frontend URL if needed
+    origin: ["http://localhost:5173", "https://manageemployeetest.onrender.com"],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -46,10 +46,10 @@ app.get("*", (req, res) => {
 // Create an HTTP server from the Express app
 const server = http.createServer(app);
 
-// OPTIONAL: Initialize socket.io if you need real‑time features.
+// Initialize socket.io with updated CORS configuration
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // update this as needed for production
+    origin: ["http://localhost:5173", "https://manageemployeetest.onrender.com"],
     methods: ["GET", "POST"],
   },
 });
