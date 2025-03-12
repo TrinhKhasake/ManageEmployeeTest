@@ -1,20 +1,18 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "../.env" });
+dotenv.config({ path: "../.env" }); // Adjust the path if needed
 
 import pkg from "pg";
 const { Pool } = pkg;
 
-const sslConfig = process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false;
-
+// Create a new Pool using the DATABASE_URL from the .env file
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT || 5432,
-  ssl: sslConfig
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
+// Optional: Test the database connection on startup
 pool.connect().catch((err) => {
   console.error("Database connection error:", err);
 });
