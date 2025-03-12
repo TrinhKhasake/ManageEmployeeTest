@@ -2,11 +2,14 @@ import pkg from "pg";
 const { Pool } = pkg;
 
 const pool = new Pool({
-  user: process.env.DB_USER || "postgres",
-  host: process.env.DB_HOST || "34.81.89.236",
-  database: process.env.DB_NAME || "postgres",
-  password: process.env.DB_PASSWORD || "cuoi08",
-  port: process.env.DB_PORT || 5432
+  user: "employeemanagement",
+  host: "dpg-cv8kh5dumphs73cptj4g-a.singapore-postgres.render.com",
+  database: "employeemanagement_uhfq",
+  password: "WsEylr9iInxF5CdS027LZGEnn2zf8BzP",
+  port: 5432,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
 pool.connect().catch((err) => {
