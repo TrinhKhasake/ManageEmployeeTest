@@ -28,6 +28,7 @@
     "@schedule-x/theme-default": "^2.21.0",
     "@tailwindcss/vite": "^4.0.8",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
     "employee-management-system": "file:..",
     "file-saver": "^2.0.5",
     "lucide-react": "^0.476.0",
@@ -43,11 +44,11 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0",
     "@eslint/js": "^9.21.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^7.6.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.0.0",

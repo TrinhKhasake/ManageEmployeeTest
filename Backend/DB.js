@@ -1,15 +1,18 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import pkg from "pg";
 const { Pool } = pkg;
 
+const sslConfig = process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false;
+
 const pool = new Pool({
-  user: "employeemanagement",
-  host: "dpg-cv8kh5dumphs73cptj4g-a.singapore-postgres.render.com",
-  database: "employeemanagement_uhfq",
-  password: "WsEylr9iInxF5CdS027LZGEnn2zf8BzP",
-  port: 5432,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT || 5432,
+  ssl: sslConfig
 });
 
 pool.connect().catch((err) => {
