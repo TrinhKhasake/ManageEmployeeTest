@@ -14,7 +14,7 @@ function Login() {
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
 
   // Use environment variable or default to localhost for development
-  const backendUrl = process.env.REACT_APP_API_URL || "http://localhost:3000";
+  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   const fetchMockData = async () => {
     try {
