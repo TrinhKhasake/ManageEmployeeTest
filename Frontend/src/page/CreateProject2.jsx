@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert";
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const CreateProject2 = () => {
   const [formValues, setFormValues] = useState({
     project_name: "",
@@ -34,7 +36,7 @@ const CreateProject2 = () => {
     e.preventDefault();
     try {
       // Step 1: Create the project
-      const response = await fetch("http://localhost:3000/projects/create-project", {
+      const response = await fetch(`${backendUrl}/projects/create-project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +50,7 @@ const CreateProject2 = () => {
         setIsEditing(true);
 
         // Step 2: Assign the creator as a manager
-        const addEmployeeResponse = await fetch("http://localhost:3000/projects/add-employee", {
+        const addEmployeeResponse = await fetch(`${backendUrl}/projects/add-employee`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -86,7 +88,7 @@ const CreateProject2 = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3000/projects/update", {
+      const response = await fetch(`${backendUrl}/projects/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +125,7 @@ const CreateProject2 = () => {
     try {
       const employee_ids = selectedEmployees.map((emp) => emp.employee_id);
       // Since new employees added later are not managers, ismanager is always an empty array.
-      const response = await fetch("http://localhost:3000/projects/add-employee", {
+      const response = await fetch(`${backendUrl}/projects/add-employee`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +169,7 @@ const CreateProject2 = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:3000/get-employees");
+        const response = await fetch(`${backendUrl}/get-employees`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
