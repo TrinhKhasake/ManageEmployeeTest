@@ -1,116 +1,80 @@
-// import { useContext } from 'react';
-// import { Employee } from '../context/ContextProvider';
-// import MobiscrollCalendar from '../component/MobiscrollCalendar';
-
-// function Timesheet() {
-//   const { employeeId } = useContext(Employee);
-
-//   return (
-//     <div className="flex flex-col p-4">
-//       <h1 className="text-4xl font-bold text-gray-900">Timesheet</h1>
-//       {/* Render the Mobiscroll Calendar component and pass any required props */}
-//       <MobiscrollCalendar employeeId={employeeId} />
-//     </div>
-//   );
-// }
-
-// export default Timesheet;
-
-import { Draggable, Dropcontainer, Eventcalendar, getJson, setOptions, Toast } from '@mobiscroll/react';
-import PropTypes from 'prop-types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-
-setOptions({
-  theme: 'ios',
-  themeVariant: 'light'
-});
+import { useEffect, useState, useContext } from "react";
+import { createEventModalPlugin } from "@schedule-x/event-modal";
+import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
+import { useNavigate } from "react-router-dom";
+import { useCalendarApp, ScheduleXCalendar } from "@schedule-x/react";
+import {
+  createViewDay,
+  createViewMonthAgenda,
+  createViewMonthGrid,
+  createViewWeek,
+} from "@schedule-x/calendar";
+import { createEventsServicePlugin } from "@schedule-x/events-service";
+import { Employee } from "../context/ContextProvider";
+import "@schedule-x/theme-default/dist/index.css";
+import { CirclePlus, Pencil } from "lucide-react";
 
 const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-function Task({ data }) {
-  const [draggable, setDraggable] = useState();
-
-  const eventLength = Math.round(Math.abs(new Date(data.end).getTime() - new Date(data.start).getTime()) / (60 * 60 * 1000));
-
-  return (
-    <div>
-      {!data.hide && (
-        <div ref={setDraggable} className="external-drop-task" style={{ background: data.color }}>
-          <div>{data.title}</div>
-          <div>{eventLength + ' hour' + (eventLength > 1 ? 's' : '')}</div>
-          <Draggable dragData={data} element={draggable} />
-        </div>
-      )}
-    </div>
-  );
+function CalendarWrapper({ tasks, eventsService }) {
+  const calendar = useCalendarApp({
+    views: [
+      createViewDay(),
+      createViewWeek(),
+      createViewMonthGrid(),
+      createViewMonthAgenda(),
+    ],
+    events: tasks,
+    plugins: [eventsService, createEventModalPlugin(), createDragAndDropPlugin()],
+    callbacks: {
+      onEventUpdate(updatedEvent) {
+        console.log("onEventUpdate", updatedEvent);
+      },
+    },
+  });
+  return <ScheduleXCalendar calendarApp={calendar} />;
 }
 
-Task.propTypes = {
-  data: PropTypes.object.isRequired,
-};
-
 function Timesheet() {
-  const [dropCont, setDropCont] = useState();
-  const [isToastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState();
-  const [myEvents, setEvents] = useState([]);
-  const [myTasks, setTasks] = useState([
-    {
-      id: 1,
-      title: 'Product team meeting',
-      color: '#cf4343',
-      start: '2025-03-13T08:00',
-      end: '2025-03-13T09:30',
-    },
-    {
-      id: 2,
-      title: 'General orientation',
-      color: '#e49516',
-      start: '2025-03-13T08:00',
-      end: '2025-03-13T10:00',
-    },
-    {
-      id: 3,
-      title: 'Client Training',
-      color: '#8c429f',
-      start: '2025-03-13T10:00',
-      end: '2025-03-13T14:00',
-    },
-    {
-      id: 4,
-      title: 'CEO Conference',
-      color: '#63b548',
-      start: '2025-03-13T12:00',
-      end: '2025-03-13T18:00',
-    },
-  ]);
-
-  const myView = useMemo(() => ({ calendar: { labels: true } }), []);
-
-  const handleEventCreate = useCallback(
-    (args) => {
-      setTasks(myTasks.filter((item) => item.id !== args.event.id));
-      setToastMessage(args.event.title + ' added');
-      setToastOpen(true);
-    },
-    [myTasks],
-  );
-
-  const handleEventDelete = useCallback((args) => {
-    setToastMessage(args.event.title + ' unscheduled');
-    setToastOpen(true);
-  }, []);
-
-  const handleItemDrop = useCallback((args) => {
-    if (args.data) {
-      setTasks((myTasks) => [...myTasks, args.data]);
+  // Format date correctly for ScheduleX
+  const formatDateTime = (dateString) => {
+    if (!dateString) {
+      console.warn("Empty date string provided");
+      return "";
     }
-  }, []);
 
-  const handleToastClose = useCallback(() => {
-    setToastOpen(false);
-  }, []);
+    try {
+      const date = new Date(dateString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn("Invalid date string:", dateString);
+        return "";
+      }
+      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
 
+      // Schedule X format: "YYYY-MM-DD HH:MM" (24-hour format)
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
+    } catch (error) {
+      console.error("Error formatting date:", error, dateString);
+      return "";
+    }
+  };
+  const navigate = useNavigate();
+  const { employeeId } = useContext(Employee);
+
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Create a stable eventsService instance.
+  const eventsService = useState(() => createEventsServicePlugin())[0];
+
+  // Fetch tasks from the backend and update tasks state.
   useEffect(() => {
     const fetchTasks = async () => {
       console.log("Fetching timesheet for Employee ID:", employeeId);
@@ -131,16 +95,7 @@ function Timesheet() {
             end: formatDateTime(task.emp_enddate),
           }));
 
-          // Guarantee a test event is included
-          const testEvent = {
-            id: "test-1",
-            title: "Test Event",
-            start: "2025-03-03 22:00",
-            end: "2025-03-03 23:00",
-            description: "This is a manually added test event.",
-          };
-
-          setTasks([...formattedEvents, testEvent]);
+          setTasks([...formattedEvents]);
         } else {
           setTasks([]);
         }
@@ -154,31 +109,66 @@ function Timesheet() {
     fetchTasks();
   }, [employeeId]);
 
+  // Debug rendered calendar
+  useEffect(() => {
+    if (tasks.length > 0) {
+      // Check for date range issues
+      const now = new Date();
+      const oneMonthAgo = new Date(now);
+      oneMonthAgo.setMonth(now.getMonth() - 1);
+      const oneMonthAhead = new Date(now);
+      oneMonthAhead.setMonth(now.getMonth() + 1);
+      
+      const eventsInRange = tasks.filter(event => {
+        const startDate = new Date(event.start);
+        return startDate >= oneMonthAgo && startDate <= oneMonthAhead;
+      });
+      
+      if (eventsInRange.length === 0 && tasks.length > 0) {
+        console.warn("No events in the visible date range (±1 month from today)");
+        console.log("Event date ranges:", tasks.map(e => ({ title: e.title, start: e.start, end: e.end })));
+      }
+    }
+  }, [tasks]);
+
   return (
-    <div className="mbsc-grid mbsc-no-padding">
-      <div className="mbsc-row">
-        <div className="mbsc-col-sm-9 external-drop-calendar">
-          <Eventcalendar
-            data={myEvents}
-            view={myView}
-            dragToMove={true}
-            dragToCreate={true}
-            externalDrop={true}
-            externalDrag={true}
-            onEventCreate={handleEventCreate}
-            onEventDelete={handleEventDelete}
-          />
-        </div>
-        <div className="mbsc-col-sm-3 external-drop-cont" ref={setDropCont}>
-          <Dropcontainer onItemDrop={handleItemDrop} element={dropCont}>
-            <div className="mbsc-form-group-title">Available tasks</div>
-            {myTasks.map((task) => (
-              <Task key={task.id} data={task} />
-            ))}
-          </Dropcontainer>
+    <div className="flex flex-col p-4">
+      <div className="flex items-center justify-between w-full px-20 mt-5 mb-4">
+        <h1 className="text-4xl font-bold text-gray-900">Timesheet</h1>
+        <div className="flex gap-2">
+          <button
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            onClick={() => navigate(`/create-timeslot`)}
+          >
+            <CirclePlus className="w-5 h-5" /> Create Timeslot
+          </button>
+          <button
+            className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+            onClick={() => navigate("/edit-timeslot")}
+          >
+            <Pencil className="w-5 h-5" /> Edit Timeslot
+          </button>
         </div>
       </div>
-      <Toast message={toastMessage} isOpen={isToastOpen} onClose={handleToastClose} />
+
+      <div className="flex justify-center items-center w-full p-4">
+        <div className="w-full max-w-[1400px]">
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            <>
+              {/* Debug info */}
+              {tasks.length === 0 && (
+                <div className="mb-4 p-4 bg-yellow-100 border border-yellow-400 rounded">
+                  <p>No events to display. Check console for debugging information.</p>
+                </div>
+              )}
+              
+              <CalendarWrapper key={tasks.length} tasks={tasks} eventsService={eventsService} />
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
