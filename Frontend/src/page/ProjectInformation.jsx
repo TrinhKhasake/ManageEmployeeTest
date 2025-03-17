@@ -54,6 +54,13 @@ const ProjectInformation = () => {
         <h1 className="text-4xl font-bold text-gray-900 flex items-center gap-2">
           Project Information
         </h1>
+        <button
+          className="cursor-pointer flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-white font-medium hover:bg-green-500"
+          onClick={() => navigate("/update-project")}
+        >
+          {/* <CirclePlus className="w-5 h-5" />  */}
+          Update Project
+        </button>
       </div>
 
       <div className="mt-4">
@@ -105,37 +112,30 @@ const ProjectInformation = () => {
       <div className="flow-root rounded-b-lg border border-gray-300 py-3 shadow-xs bg-white">
         <dl className="-my-3 divide-y divide-gray-100 text-sm">
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Project Name</dt>
+            <dt className="font-medium text-gray-900">Name</dt>
             <dd className="text-gray-700 sm:col-span-2">
               {project ? project.project_name : "N/A"}
             </dd>
           </div>
 
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Project Description</dt>
+            <dt className="font-medium text-gray-900">Description</dt>
             <dd className="text-gray-700 sm:col-span-2">
               {project ? project.project_description : "N/A"}
             </dd>
           </div>
 
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Start Date</dt>
+            <dt className="font-medium text-gray-900">Duration</dt>
             <dd className="text-gray-700 sm:col-span-2">
-              {project ? formatDate(project.start_date) : "N/A"}
-            </dd>
-          </div>
-
-          <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium text-gray-900">Due Date</dt>
-            <dd className="text-gray-700 sm:col-span-2">
-              {project ? formatDate(project.due_date) : "N/A"}
+              {project ? formatDate(project.start_date) : "N/A"} - {project ? formatDate(project.due_date) : "N/A"}
             </dd>
           </div>
 
           <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
             <dt className="font-medium text-gray-900">Customer</dt>
             <dd className="text-gray-700 sm:col-span-2">
-              {project ? project.customername : "N/A"}
+              {project ? project.customer_name : "N/A"}
             </dd>
           </div>
 
@@ -152,7 +152,7 @@ const ProjectInformation = () => {
               {project ? project.cost : "N/A"}
             </dd>
           </div>
-          
+
           {/* <div className="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
             <dt className="font-medium text-gray-900">Employees</dt>
             <dd className="text-gray-700 sm:col-span-2">

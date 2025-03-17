@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 
-dotenv.config({ path: "../.env" });
+dotenv.config();
 
 const router = express.Router();
 const saltRounds = 10;

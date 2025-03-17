@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Employee } from "../context/ContextProvider";
 import Alert from "../component/Alert"; // Import Alert component
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 function Login() {
   const initialValues = {
     email: "",
@@ -11,10 +13,8 @@ function Login() {
   const [formValues, setFormValues] = useState(initialValues);
   const navigate = useNavigate();
   const { employeeId, setEmployeeId, setisadmin } = useContext(Employee);
+  // Alert state: using an object with show, message and type
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
-
-  // Use environment variable or default to localhost for development
-  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   const fetchMockData = async () => {
     try {

@@ -1,30 +1,34 @@
-CREATE TABLE Project
+DROP TABLE IF EXISTS public.customer;
+
+CREATE TABLE IF NOT EXISTS public.customer
 (
-  project_id SERIAL PRIMARY KEY,
-  project_name VARCHAR(255) NOT NULL,
-  project_description TEXT NOT NULL,
-  start_date DATE NOT NULL,
-  due_date DATE NOT NULL,
-  project_status VARCHAR(50) NOT NULL,
-  customername VARCHAR(255) NOT NULL,
-  nation VARCHAR(100) NOT NULL,
-  cost DECIMAL(10,2) NOT NULL
+  company_code      VARCHAR(50) PRIMARY KEY,
+  legal_name        VARCHAR(255) NOT NULL,
+  street_1          VARCHAR(60) NOT NULL,
+  street_2          VARCHAR(60),
+  street_3          VARCHAR(60),
+  house_number      VARCHAR(20) NOT NULL,
+  postal_code       INTEGER NOT NULL,       -- Changed to INTEGER
+  city              VARCHAR(100) NOT NULL,
+  region            VARCHAR(100) NOT NULL,
+  country           VARCHAR(50) NOT NULL,         -- ISO country code
+  tax_number        VARCHAR(50) NOT NULL,
+  order_currency    CHAR(3) NOT NULL,         -- ISO currency code
+  payment_term      VARCHAR(50) NOT NULL,     -- formerly "paymenterm"
+  payment_method    VARCHAR(50) NOT NULL,     -- formerly "paymenmethod"
+  account_code      VARCHAR(50) NOT NULL,     -- formerly "accountcode"
+  accountant        VARCHAR(100) NOT NULL,
+  invoice_email     VARCHAR(255),    -- formerly "invoiceemail"
+  notices_email     VARCHAR(255),    -- formerly "noticesemail"
+  account_manager   VARCHAR(100) NOT NULL,
+  account_partner   VARCHAR(100) NOT NULL,
+  sales_manager     VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE Task
-(
-  task_id SERIAL PRIMARY KEY,
-  project_id INT NOT NULL,
-  task_name VARCHAR(255) NOT NULL,
-  task_description TEXT NOT NULL,
-  start_date DATE NOT NULL,
-  due_date DATE NOT NULL,
-  task_status VARCHAR(50) NOT NULL,
-  FOREIGN KEY (project_id) REFERENCES Project(project_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE
-);
 
-CREATE TABLE Role
+DROP TABLE IF EXISTS public.project, public.task, public.task_assignment, public.project_member, public.employee;
+
+CREATE TABLE public.role
 (
   role_id SERIAL PRIMARY KEY,
   role_name VARCHAR(255) NOT NULL,
@@ -32,7 +36,7 @@ CREATE TABLE Role
   pay_rate_vn DECIMAL(10,2) NOT NULL
 );
 
-CREATE TABLE Employee
+CREATE TABLE public.employee
 (
   employee_id SERIAL PRIMARY KEY,
   firstname VARCHAR(255) NOT NULL,
@@ -45,27 +49,54 @@ CREATE TABLE Employee
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE Project_Member
-(
-  ismanager BOOLEAN NOT NULL,
-  project_id INT NOT NULL,
-  employee_id INT NOT NULL,
-  PRIMARY KEY (project_id, employee_id),
-  FOREIGN KEY (project_id) REFERENCES Project(project_id) 
-    ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) 
+CREATE TABLE public.project (
+  project_id          VARCHAR(50) PRIMARY KEY,  -- Changed type to VARCHAR
+  project_name        VARCHAR(255) NOT NULL,
+  project_description TEXT NOT NULL,
+  start_date          DATE NOT NULL,
+  due_date            DATE NOT NULL,
+  project_status      VARCHAR(50) NOT NULL,
+  customer_id         VARCHAR(50) NOT NULL,     -- Foreign key to Customer
+  nation              VARCHAR(100) NOT NULL,
+  cost                DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (customer_id) REFERENCES customer(company_code)
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-CREATE TABLE Task_Assignment
-(
-  emp_startdate DATE,
-  emp_enddate DATE,
+-- Create Task table referencing Project
+CREATE TABLE public.task (
+  task_id SERIAL PRIMARY KEY,
+  project_id VARCHAR(50) NOT NULL,
+  task_name VARCHAR(255) NOT NULL,
+  task_description TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  task_status VARCHAR(50) NOT NULL,
+  FOREIGN KEY (project_id) REFERENCES project(project_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create Project_employee table to manage many-to-many relationship between Project and Employee
+CREATE TABLE public.project_employee (
+  ismanager BOOLEAN NOT NULL,
+  project_id VARCHAR(50) NOT NULL,
+  employee_id INT NOT NULL,
+  PRIMARY KEY (project_id, employee_id),
+  FOREIGN KEY (project_id) REFERENCES project(project_id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+    ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create Task_Assignment table referencing Employee and Task
+CREATE TABLE public.task_assignment (
+  assignment_id SERIAL PRIMARY KEY,
+  emp_startdate TIMESTAMP,
+  emp_enddate TIMESTAMP,
   employee_id INT NOT NULL,
   task_id INT NOT NULL,
-  PRIMARY KEY (employee_id, task_id),
-  FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) 
+  FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
     ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (task_id) REFERENCES Task(task_id) 
+  FOREIGN KEY (task_id) REFERENCES task(task_id)
     ON DELETE CASCADE ON UPDATE CASCADE
 );

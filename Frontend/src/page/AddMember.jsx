@@ -6,6 +6,8 @@ import "primeicons/primeicons.css";
 import Alert from "../component/Alert";
 import { ProjectContext } from '../context/ContextProvider';
 
+const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const AddMember = () => {
   const { projectId } = useContext(ProjectContext);
   const [formValues, setFormValues] = useState({ projectId });
@@ -23,8 +25,6 @@ const AddMember = () => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
   };
-
-  const backendUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   // Fetch all employees
   useEffect(() => {
@@ -46,7 +46,7 @@ const AddMember = () => {
     const fetchProjectMembers = async () => {
       if (!projectId) return;
       try {
-        const response = await fetch(`${backendUrl}projects/info`, {
+        const response = await fetch(`${backendUrl}/projects/info`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ projectId }),

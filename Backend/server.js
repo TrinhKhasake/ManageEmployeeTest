@@ -9,6 +9,7 @@ import projectRoutes from "./routes/project.js";
 import authRoutes from "./routes/auth.js";
 import infoRoutes from "./routes/information.js";
 import timesheetRoutes from "./routes/timesheet.js";
+import customerRoutes from "./routes/customer.js";
 
 // Setup __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -19,7 +20,7 @@ const app = express();
 // Enable CORS for both development and production origins
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://manageemployeetest.onrender.com"],
+    origin: ["http://localhost:5173", "https://employee-management-system1-ddqn.onrender.com"],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -29,6 +30,7 @@ app.use(
 app.use(express.json());
 
 // Mount API routes
+app.use("/customer", customerRoutes);
 app.use("/projects", projectRoutes);
 app.use("/task", taskRoutes);
 app.use("/", authRoutes);
@@ -49,7 +51,7 @@ const server = http.createServer(app);
 // Initialize socket.io with updated CORS configuration
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://manageemployeetest.onrender.com"],
+    origin: ["http://localhost:5173", "https://employee-management-system1-ddqn.onrender.com"],
     methods: ["GET", "POST"],
   },
 });

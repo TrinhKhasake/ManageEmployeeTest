@@ -14,7 +14,7 @@ import Home from "./page/Home";
 import ProjectDetail from "./page/ProjectDetail";
 import Navbar from "./component/Navbar";
 import Timesheet from "./page/Timesheet";
-import Timesheet2 from "./page/Timesheet2";
+// import Timesheet2 from "./page/Timesheet2";
 import Login from "./page/Login";
 import CreateEmployee from "./page/CreateEmployee";
 import CreateTimeslot from "./page/CreateTimeslot";
@@ -30,6 +30,12 @@ import ViewEmployeeInfo from "./page/ViewEmployeeInfo";
 import EditTimeslot from "./page/EditTimeslot";
 import UpdateTimeslot from "./page/UpdateTimeslot";
 import ViewAccountForStaff from "./page/ViewAccountForStaff";
+import Customer from "./page/Customer";
+import CustomerInformation from "./page/CustomerInformation";
+import CustomerPayment from "./page/CustomerPayment";
+import CreateCustomer from "./page/CreateCustomer";
+import UpdateCustomer from "./page/UpdateCustomer";
+import UpdateProject from "./page/UpdateProject";
 
 function Layout() {
   const location = useLocation();
@@ -60,8 +66,15 @@ function Layout() {
           <Route path="/view-account" element={<ViewEmployeeInfo />} />
           <Route path="/view-account-for-staff" element={<ViewAccountForStaff />} />
           <Route path="/edit-timeslot" element={<EditTimeslot />} />
-          <Route path="/timesheet2" element={<Timesheet2 />} />
+          {/* <Route path="/timesheet2" element={<Timesheet2 />} /> */}
           <Route path="/update-timeslot/:assignment_id" element={<UpdateTimeslot />} />
+          <Route path="/customer" element={<Customer />} />
+          <Route path="/customer-information" element={<CustomerInformation />} />
+          <Route path="/customer-payment" element={<CustomerPayment />} />
+          <Route path="/create-customer" element={<CreateCustomer />} />
+          <Route path="/update-customer" element={<UpdateCustomer />} />
+          <Route path="/update-project" element={<UpdateProject />} />
+
 
         </Routes>
       </ContextProvider>
